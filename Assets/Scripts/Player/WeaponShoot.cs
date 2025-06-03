@@ -2,32 +2,59 @@
 
 public class WeaponShoot : MonoBehaviour
 {
-    public Animator animator;               // Animator để phát animation bắn
-    public float range = 100f;              // Tầm bắn raycast
-
-    // Danh sách tag có thể bị bắn trúng (đã thêm sẵn Ground và Enemy)
+    public Animator animator;
+    public float range = 100f;
+    public int damage = 20;
     public string[] targetTags = { "Ground", "Enemy" };
+
+    public GameObject arrowPrefab;
+    public Transform arrowSpawnPoint;
+    public float arrowSpeed = 50f;
 
     void Update()
     {
         if (Input.GetButtonDown("Fire1"))
         {
-            // Gửi trigger tới Animator
             animator.SetTrigger("Shoot");
 
-            // Tạo ray từ vị trí và hướng hiện tại
+            // Bắn mũi tên prefab
+            GameObject arrow = Instantiate(arrowPrefab, arrowSpawnPoint.position, arrowSpawnPoint.rotation);
+
+            Rigidbody rb = arrow.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.linearVelocity = arrowSpawnPoint.forward * arrowSpeed;
+            }
+            else
+            {
+                Debug.LogWarning("Arrow prefab chưa có Rigidbody!");
+            }
+
+            // Raycast để kiểm tra trúng đạn
             Ray ray = new Ray(transform.position, transform.forward);
             RaycastHit hit;
 
             if (Physics.Raycast(ray, out hit, range))
             {
-                // Kiểm tra tag của vật thể bị bắn có nằm trong danh sách cho phép không
+                Debug.DrawRay(ray.origin, ray.direction * range, Color.red, 1f);
+                Debug.Log("Đã bắn trúng: " + hit.collider.name + " (Tag: " + hit.collider.tag + ")");
+
                 foreach (string tag in targetTags)
                 {
                     if (hit.collider.CompareTag(tag))
                     {
-                        Debug.Log("Bắn trúng: " + hit.collider.name + " (Tag: " + tag + ")");
-                        // TODO: xử lý trúng đạn tại đây (trừ máu, spawn hiệu ứng, v.v.)
+                        if (tag == "Enemy")
+                        {
+                            EnemyHealth enemy = hit.collider.GetComponent<EnemyHealth>();
+                            if (enemy == null)
+                                enemy = hit.collider.GetComponentInParent<EnemyHealth>();
+
+                            if (enemy != null)
+                            {
+                                enemy.TakeDamage(damage);
+                            }
+                        }
+
                         break;
                     }
                 }
