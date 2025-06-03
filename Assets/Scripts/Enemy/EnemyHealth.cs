@@ -2,19 +2,18 @@
 
 public class EnemyHealth : MonoBehaviour
 {
-    public int maxHealth = 100;
+    public int MaxHealth = 100;
     private int currentHealth;
 
     void Start()
     {
-        currentHealth = maxHealth;
+        currentHealth = MaxHealth;
     }
 
-    // Hàm nhận damage
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;
-        Debug.Log(gameObject.name + " took " + damage + " damage. HP: " + currentHealth);
+        Debug.Log(gameObject.name + " bị trúng đạn! Máu còn: " + currentHealth);
 
         if (currentHealth <= 0)
         {
@@ -24,7 +23,8 @@ public class EnemyHealth : MonoBehaviour
 
     void Die()
     {
-        Debug.Log(gameObject.name + " died.");
+        Debug.Log(gameObject.name + " đã chết!");
+        // Tùy bạn: có thể hủy object hoặc phát animation chết
         Destroy(gameObject);
     }
 }

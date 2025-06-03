@@ -4010,6 +4010,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controller: {fileID: 655107624707790473}
+  animator: {fileID: 0}
   speed: 12
   gravity: -19.62
   jumpHeight: 3
@@ -4032,8 +4033,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animator: {fileID: 8855155459548784559}
   range: 200
+  damage: 20
   targetTags:
   - Ground
+  arrowPrefab: {fileID: 0}
+  arrowSpawnPoint: {fileID: 0}
+  arrowSpeed: 50
 --- !u!54 &1279143718988206830
 Rigidbody:
   m_ObjectHideFlags: 0
