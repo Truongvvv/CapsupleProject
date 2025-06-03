@@ -1,3 +1,4 @@
+﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,6 +6,7 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     public CharacterController controller;
+    public Animator animator;
 
     public float speed = 12f;
     public float gravity = -9.81f * 2;
@@ -15,13 +17,11 @@ public class PlayerMovement : MonoBehaviour
     public LayerMask groundMask;
 
     Vector3 velocity;
-
     bool isGrounded;
 
-    // Update is called once per frame
     void Update()
     {
-        //checking if we hit the ground to reset our falling velocity, otherwise we will fall faster the next time
+        // Kiểm tra nhân vật có đang đứng trên mặt đất không
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
 
         if (isGrounded && velocity.y < 0)
@@ -29,23 +29,31 @@ public class PlayerMovement : MonoBehaviour
             velocity.y = -2f;
         }
 
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
+        // Lấy input
+        float x = Input.GetAxisRaw("Horizontal");
+        float z = Input.GetAxisRaw("Vertical");
 
-        //right is the red Axis, foward is the blue axis
         Vector3 move = transform.right * x + transform.forward * z;
+        controller.Move(move.normalized * speed * Time.deltaTime);
 
-        controller.Move(move * speed * Time.deltaTime);
-
-        //check if the player is on the ground so he can jump
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
-            //the equation for jumping
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
         }
 
         velocity.y += gravity * Time.deltaTime;
-
         controller.Move(velocity * Time.deltaTime);
+
+        // Reset tất cả hướng
+        animator.SetBool("isForward", false);
+        animator.SetBool("isBackward", false);
+        animator.SetBool("isLeft", false);
+        animator.SetBool("isRight", false);
+
+        // Bật hướng tương ứng
+        if (z > 0) animator.SetBool("isForward", true);
+        else if (z < 0) animator.SetBool("isBackward", true);
+        else if (x < 0) animator.SetBool("isLeft", true);
+        else if (x > 0) animator.SetBool("isRight", true);
     }
 }
